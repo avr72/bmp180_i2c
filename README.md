@@ -1,5 +1,5 @@
 # bmp180_i2c
-Beaglebone black and pressure sensor BMP180 communication using I2C, C code cross compiled in Eclipse
+# Beaglebone black and pressure sensor BMP180 communication using I2C, C code cross compiled in Eclipse
 
 The purpose of the code is to demonstrate how to use I2C device on beaglebone board.  
 
