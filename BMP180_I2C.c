@@ -183,11 +183,15 @@ int main(int argc, char* argv[]) {
 	double temperature, pressure, altitude, p0=101325.0,interval=0.5;
 	int i,n = 0;
 	FILE *fp=NULL;
+	char *fileName=NULL;
 
 	if (argc > 2){
 		interval = atof(argv[1]);
 		n = (int)(atof(argv[2])/interval+0.5);
-		if (argc>3) fp=fopen(argv[3],"w");
+		if (argc>3) {
+			fileName=malloc(strlen(argv[3])+1);
+			strcpy(fileName,argv[3]);
+		}
 	}
 
 	time(&rawtime);
@@ -220,9 +224,17 @@ int main(int argc, char* argv[]) {
 		pressure = bmp180CorrectPressure(bmp180ReadUP(bmp180));
 		altitude = 44330.0*(1-pow(pressure/p0,1/5.255));
 		fprintf(stdout, "%.1lf %.1lf %.1lf\n", t - t0, temperature, pressure);
-		if (fp) fprintf(fp, "%.1lf %.1lf %.1lf\n", t - t0, temperature, pressure);
+
+		if (fileName!=NULL) {
+			fp=fopen(fileName,"a");
+			if (fp){
+				fprintf(fp, "%.1lf %.1lf %.1lf\n", t - t0, temperature, pressure);
+				fclose(fp);	// close log file
+			}
+		}
+
 		while((t-t0)<(i+1)*interval){
-			usleep(10);
+			usleep(5000);
 			time(&rawtime);
 			timeinfo = localtime(&rawtime);
 			gettimeofday(&tv, NULL);
@@ -231,7 +243,5 @@ int main(int argc, char* argv[]) {
 	}
 
 	i2c_close(bmp180);	// close device
-	if (fp) fclose(fp);	// close log file
-
 	return 1;
 }
